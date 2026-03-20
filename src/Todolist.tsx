@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Button } from 'react-bootstrap';
+import TodoModal from './TodoModal';
 
 type Todo = {
     id: number;
@@ -16,6 +17,8 @@ const Todolist : React.FC = () => {
     ]);
 
     const [newTodo, setNewTodo] = useState<string>('');
+    const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     const handleCheckedChange = (itemId: number) => {
         const prevItems = todos.map((todo) =>
@@ -29,6 +32,20 @@ const Todolist : React.FC = () => {
            setTodos([...todos, { id: Date.now(), text: newTodo, isChecked: false }]);
            setNewTodo('');
         }
+    };
+
+    const removeTodo = (id : number) =>{
+        setTodos(todos.filter((todo) => todo.id !== id));
+    }
+
+    const handleTodoClick = (todo: Todo) => {
+        setSelectedTodo(todo);
+        setShowModal(true);
+    }
+    
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedTodo(null);
     };
 
     return(
@@ -60,13 +77,16 @@ const Todolist : React.FC = () => {
                                     <del>{todo.text}</del> : todo.text
                                     }</span>
                                     <button className="delbutton" onClick={() => {
-                                        setTodos(todos.filter((t) => t.id !== todo.id));
+                                        removeTodo(todo.id);
                                     }}>삭제</button>
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
+            {showModal && selectedTodo && (
+                <TodoModal show={showModal} todo={selectedTodo} handleClose={handleCloseModal} />
+            )}
         </div>
     );
 }   
